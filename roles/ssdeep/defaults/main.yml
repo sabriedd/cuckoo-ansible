@@ -1,8 +1,12 @@
 ---
 
+# Only change the value of ssdeep_version
 ssdeep_version: 2.13
+# because url of the ssdeep repository is determinist
 ssdeep_repo: http://garr.dl.sourceforge.net/project/ssdeep/ssdeep-{{ ssdeep_version }}/ssdeep-{{ ssdeep_version }}.tar.gz
+# path where ssdeep and pydeep will be installed
 ssdeep_path: /home/cuckoo/ssdeep
 
+# url of the pydeep repository
 pydeep_repo: https://github.com/kbandla/pydeep.git
 pydeep_version: master

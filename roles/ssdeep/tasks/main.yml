@@ -1,9 +1,5 @@
 ---
 
-  - debug: var={{ ssdeep_version }}
-  - debug: var={{ ssdeep_repo }}
-  - debug: var={{ ssdeep_path }}
-
   - name: change ownership of ssdeep folder (group writeable temporary)
     file: path={{ ssdeep_path }} state=directory mode=0775 owner={{ cuckoo_user }} group={{ cuckoo_group }} recurse=yes
     changed_when: False

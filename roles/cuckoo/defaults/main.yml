@@ -2,8 +2,13 @@
 
 cuckoo_group: cuckoo
 cuckoo_user: cuckoo
+# Those two values are used to create a new cuckoo user and group
+
 cuckoo_repo: https://github.com/cuckoobox/cuckoo
 cuckoo_version: master
+# You can change the cuckoo version to reflect any branch available on github
+# cuckoo_version: monitor
 
 install_yara: True
 install_ssdeep: True
+# Boolean switches used to install Yara and pydeep/ssdeep
