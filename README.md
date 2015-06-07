@@ -48,3 +48,10 @@ ansible-playbook playbook.yml -i inventory.txt -k -K
 the `-k` option is used for ssh password prompt
 
 the `-K` option is used for sudo password prompt
+
+### Cuckoo Configuration :
+Now you have a cuckoo setup on your machine, prepare your guest machines.
+please refer to
+http://docs.cuckoosandbox.org/en/latest/installation/host/configuration/
+
+and proceed with the rest of cuckoo's configuration
