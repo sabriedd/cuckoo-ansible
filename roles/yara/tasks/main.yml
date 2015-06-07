@@ -1,0 +1,52 @@
+---
+  - name: check if yara is already installed
+    stat: path="{{ yara_path }}"
+    register: yara_dir
+
+  - name: clone yara repository
+    git: dest="{{ yara_path }}" repo={{ yara_repo }} version={{ yara_version }}
+    when: yara_dir.stat.exists == False
+
+  - name: install yara dependancies using apt
+    apt: name={{ item }} state=present
+    sudo: yes
+    with_items:
+      - dh-autoreconf
+      - libjansson-dev
+      - python-dev
+
+  - name: bootsrap yara
+    command: './bootstrap.sh'
+    args:
+      chdir: "{{ yara_path }}"
+
+  - name: configure yara
+    command: './configure --enable-cuckoo'
+    args:
+      chdir: "{{ yara_path }}"
+
+  - name: make yara
+    command: 'make'
+    args:
+      chdir: "{{ yara_path }}"
+
+  - name: make install yara
+    command: 'make install'
+    sudo: yes
+    args:
+      chdir: "{{ yara_path }}"
+
+  - name: build python yara
+    command: 'python setup.py build'
+    args:
+      chdir: "{{ yara_path }}/yara-python"
+
+  - name: install python yara
+    command: 'python setup.py install'
+    sudo: yes
+    args:
+      chdir: "{{ yara_path }}/yara-python"
+
+  - name: run ldconfig to load python-yara properly
+    command: 'ldconfig'
+    sudo: yes

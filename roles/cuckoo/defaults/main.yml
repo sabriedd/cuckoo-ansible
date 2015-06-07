@@ -1,0 +1,9 @@
+---
+
+cuckoo_group: cuckoo
+cuckoo_user: cuckoo
+cuckoo_repo: https://github.com/cuckoobox/cuckoo
+cuckoo_version: master
+
+install_yara: True
+install_ssdeep: True

@@ -1,0 +1,47 @@
+---
+
+- name: create group
+  group: name={{ cuckoo_group }}
+  sudo: yes
+
+- name: create user
+  user: name={{ cuckoo_user }} group={{ cuckoo_group }} shell=/bin/bash
+  sudo: yes
+
+- name: install git
+  sudo: yes
+  apt: name=git state=present
+
+- name: change ownership of cuckoo's home folder (group writeable temporary)
+  file: path=/home/{{ cuckoo_user }} state=directory mode=0775 owner={{ cuckoo_user }} group={{ cuckoo_group }} recurse=yes
+  changed_when: False
+  sudo: yes
+
+- name: create .ssh folder
+  file: path=/home/{{ cuckoo_user }}/.ssh state=directory mode=0775 owner={{ cuckoo_user }} group={{ cuckoo_group }}
+
+- name: ensure github.com is a known host
+  lineinfile:
+    dest: /home/{{ cuckoo_user }}/.ssh/known_hosts
+    create: yes
+    state: present
+    line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
+    regexp: "^github\\.com"
+
+- name: modify permition of .ssh folder
+  file: path=/home/{{ cuckoo_user }}/.ssh state=directory mode=0755 owner={{ cuckoo_user }} group={{ cuckoo_group }} recurse=yes
+  changed_when: False
+  sudo: yes
+
+- name: check if cuckoo is already installed
+  stat: path=/home/{{ cuckoo_user }}/cuckoo
+  register: cuckoo_dir
+
+- name: clone cuckoo repository
+  git: dest=/home/{{ cuckoo_user }}/cuckoo repo={{ cuckoo_repo }} version={{ cuckoo_version }}
+  when: cuckoo_dir.stat.exists == False
+
+# - name: change ownership of cuckoo's home folder
+#   file: path=/home/{{ cuckoo_user }} state=directory mode=0755 owner={{ cuckoo_user }} group={{ cuckoo_group }} recurse=yes
+#   changed_when: False
+#   sudo: yes

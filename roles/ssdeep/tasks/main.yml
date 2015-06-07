@@ -1,0 +1,56 @@
+---
+
+  - debug: var={{ ssdeep_version }}
+  - debug: var={{ ssdeep_repo }}
+  - debug: var={{ ssdeep_path }}
+
+  - name: change ownership of ssdeep folder (group writeable temporary)
+    file: path={{ ssdeep_path }} state=directory mode=0775 owner={{ cuckoo_user }} group={{ cuckoo_group }} recurse=yes
+    changed_when: False
+    sudo: yes
+
+  - name: download ssdeep source code
+    get_url: url="{{ ssdeep_repo }}" dest={{ ssdeep_path }}/ssdeep.tar.gz
+
+  - name: check if ssdeep was previously extracted
+    stat: path="{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
+    register: ssdeep_dir
+
+  - name: extract content of ssdeep archive
+    unarchive: src={{ ssdeep_path }}/ssdeep.tar.gz dest={{ ssdeep_path }}
+    when: ssdeep_dir.stat.exists == False
+
+  - name: configure ssdeep
+    command: './configure'
+    args:
+      chdir: "{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
+
+  - name: make ssdeep
+    command: 'make'
+    args:
+      chdir: "{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
+
+  - name: make install ssdeep
+    command: 'make install'
+    sudo: yes
+    args:
+      chdir: "{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
+
+  - name: clone pydeep repository
+    git: dest="{{ ssdeep_path }}/pydeep" repo={{ pydeep_repo }} version={{ pydeep_version }}
+
+  - name: build pydeep
+    command: 'python setup.py build'
+    sudo: yes
+    args:
+      chdir: "{{ ssdeep_path }}/pydeep"
+
+  - name: install pydeep
+    command: 'python setup.py install'
+    sudo: yes
+    args:
+      chdir: "{{ ssdeep_path }}/pydeep"
+
+  - name: run ldconfig to load python-pydeep properly
+    command: 'ldconfig'
+    sudo: yes

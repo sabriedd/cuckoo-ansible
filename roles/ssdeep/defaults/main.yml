@@ -1,0 +1,8 @@
+---
+
+ssdeep_version: 2.13
+ssdeep_repo: http://garr.dl.sourceforge.net/project/ssdeep/ssdeep-{{ ssdeep_version }}/ssdeep-{{ ssdeep_version }}.tar.gz
+ssdeep_path: /home/cuckoo/ssdeep
+
+pydeep_repo: https://github.com/kbandla/pydeep.git
+pydeep_version: master

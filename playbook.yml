@@ -1,0 +1,6 @@
+---
+- hosts: all
+  roles:
+    - role: cuckoo
+    - { role: yara, when: "{{ install_yara }}" }
+    - { role: ssdeep, when: "{{ install_ssdeep }}" }

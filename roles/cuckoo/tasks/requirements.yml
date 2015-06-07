@@ -1,0 +1,51 @@
+---
+  - name: update apt
+    apt: update_cache=yes cache_valid_time=43200
+    sudo: yes
+
+  - name: install dependancies using apt
+    apt: name={{ item }} state=present
+    sudo: yes
+    with_items:
+      - python
+      - python-pip
+      - mongodb
+      - qemu-kvm
+      - libvirt-bin
+      - ubuntu-vm-builder
+      - bridge-utils
+      - python-libvirt
+      - tcpdump
+      - libcap2-bin
+
+  - name: install dependancies using pip
+    pip: name={{ item }} state=present
+    sudo: yes
+    with_items:
+      - sqlalchemy
+      - dpkt
+      - python-magic
+      - jinja2
+      - pymongo
+      - bottle
+      - pefile
+      - django
+      - chardet
+      - nose
+
+  - name: install dependancies using pip
+    pip: name={{ item.name }} version={{ item.version }}
+    sudo: yes
+    with_items:
+      - { name: 'cybox', version: '2.1.0.9' }
+      - { name: 'maec', version: '4.1.0.11' }
+
+  - name: find path to the tcpdump binary
+    shell: 'find / -type f -name tcpdump -executable 2>/dev/null'
+    failed_when: False
+    register: path_tcpdump
+
+  - name: set capabilities on tcpdump
+    capabilities: path={{ path_tcpdump.stdout }} capability=cap_net_raw,cap_net_admin=eip state=present
+    sudo: yes
+    

@@ -1,0 +1,9 @@
+---
+  - include: user_presetup.yml
+    tags:
+      - setup
+
+  - include: requirements.yml
+    tags:
+      - setup
+      - requirements
