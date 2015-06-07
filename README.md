@@ -32,9 +32,19 @@ Because Ansible use SSH to configure machine, you'll need to install an ssh serv
 sudo apt-get install openssh-server
 ```
 
+
 ### Configuration :
 
 modify the files
 - `roles/cuckoo/defaults/main.yml`
 - `roles/ssdeep/defaults/main.yml`
 - `roles/yara/defaults/main.yml`
+
+
+### Usage :
+```bash
+ansible-playbook playbook.yml -i inventory.txt -k -K
+```
+the `-k` option is used for ssh password prompt
+
+the `-K` option is used for sudo password prompt
