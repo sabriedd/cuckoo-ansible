@@ -2,7 +2,7 @@
 
 Ansible playbook to install cuckoo sandbox on local machine.
 
-It is
+It is made to be used on an ubuntu 14.04.
 
 This will install the following librairies :
 
