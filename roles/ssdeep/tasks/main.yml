@@ -16,15 +16,21 @@
     unarchive: src={{ ssdeep_path }}/ssdeep.tar.gz dest={{ ssdeep_path }}
     when: ssdeep_dir.stat.exists == False
 
+  - name: check if ssdeep was previously configured
+    stat: path="{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}/config.status"
+    register: ssdeep_status
+
   - name: configure ssdeep
     command: './configure'
     args:
       chdir: "{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
+    when: ssdeep_status.stat.exists == False
 
   - name: make ssdeep
     command: 'make'
     args:
       chdir: "{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
+    when: ssdeep_status.stat.exists == False
 
   - name: make install ssdeep
     command: 'make install'

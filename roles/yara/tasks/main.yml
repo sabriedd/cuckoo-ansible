@@ -20,15 +20,21 @@
     args:
       chdir: "{{ yara_path }}"
 
+  - name: check if yara was previously configured
+    stat: path="{{ yara_path }}/config.status"
+    register: yara_status
+
   - name: configure yara
     command: './configure --enable-cuckoo'
     args:
       chdir: "{{ yara_path }}"
+    when: yara_status.stat.exists == False
 
   - name: make yara
     command: 'make'
     args:
       chdir: "{{ yara_path }}"
+    when: yara_status.stat.exists == False
 
   - name: make install yara
     command: 'make install'
