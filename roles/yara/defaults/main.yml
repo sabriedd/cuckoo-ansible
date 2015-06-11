@@ -1,8 +1,8 @@
 ---
 
 # path where yara will be installed
-yara_path: /home/cuckoo/yara
+yara_path: "{{ cuckoo_home }}/yara"
 
 # url of the yara repository
-yara_repo: https://github.com/plusvic/yara
-yara_version: master
+yara_repo: "https://github.com/plusvic/yara"
+yara_version: "master"

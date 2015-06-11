@@ -1,14 +1,22 @@
 ---
+
   - name: check if yara is already installed
-    stat: path="{{ yara_path }}"
+    stat:
+      path  : "{{ yara_path }}"
     register: yara_dir
 
   - name: clone yara repository
-    git: dest="{{ yara_path }}" repo={{ yara_repo }} version={{ yara_version }}
+    git:
+      dest    : "{{ yara_path    }}"
+      repo    : "{{ yara_repo    }}"
+      version : "{{ yara_version }}"
+    sudo: yes
     when: yara_dir.stat.exists == False
 
   - name: install yara dependancies using apt
-    apt: name={{ item }} state=present
+    apt:
+      name  : "{{ item }}"
+      state : "present"
     sudo: yes
     with_items:
       - dh-autoreconf
@@ -16,43 +24,57 @@
       - python-dev
 
   - name: bootsrap yara
-    command: './bootstrap.sh'
+    command: "./bootstrap.sh"
+    sudo: yes
     args:
       chdir: "{{ yara_path }}"
 
-  - name: check if yara was previously configured
-    stat: path="{{ yara_path }}/config.status"
-    register: yara_status
+  # - name: check if yara was previously configured
+  #   stat:
+  #     path  : "{{ yara_path }}/config.status"
+  #   register: yara_status
 
   - name: configure yara
-    command: './configure --enable-cuckoo'
+    command: "./configure --enable-cuckoo"
+    sudo: yes
     args:
       chdir: "{{ yara_path }}"
-    when: yara_status.stat.exists == False
+    # when: yara_status.stat.exists == False
 
   - name: make yara
-    command: 'make'
+    command: "make"
+    sudo: yes
     args:
       chdir: "{{ yara_path }}"
-    when: yara_status.stat.exists == False
+    # when: yara_status.stat.exists == False
 
   - name: make install yara
-    command: 'make install'
+    command: "make install"
     sudo: yes
     args:
       chdir: "{{ yara_path }}"
 
   - name: build python yara
-    command: 'python setup.py build'
+    command: "python setup.py build"
+    sudo: yes
     args:
       chdir: "{{ yara_path }}/yara-python"
 
   - name: install python yara
-    command: 'python setup.py install'
+    command: "python setup.py install"
     sudo: yes
     args:
       chdir: "{{ yara_path }}/yara-python"
 
   - name: run ldconfig to load python-yara properly
-    command: 'ldconfig'
+    command: "ldconfig"
+    sudo: yes
+
+  - name: set proper ownership on yara folder
+    file:
+      path    : "{{ yara_path }}"
+      state   : "directory"
+      owner   : "{{ cuckoo_user }}"
+      group   : "{{ cuckoo_group }}"
+      recurse : "yes"
     sudo: yes

@@ -1,6 +1,7 @@
 ---
 - hosts: all
+  remote_user: "{{ remote_user }}"
   roles:
     - role: cuckoo
-    - { role: yara, when: "{{ install_yara }}" }
+    - { role: yara  , when: "{{ install_yara   }}" }
     - { role: ssdeep, when: "{{ install_ssdeep }}" }

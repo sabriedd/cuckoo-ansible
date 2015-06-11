@@ -1,63 +1,95 @@
 ---
 
-  - name: change ownership of ssdeep folder (group writeable temporary)
-    file: path={{ ssdeep_path }} state=directory mode=0775 owner={{ cuckoo_user }} group={{ cuckoo_group }} recurse=yes
-    changed_when: False
+  - name: create ssdeep folder in cuckoo's home
+    file:
+      path    : "{{ ssdeep_path }}"
+      state   : "directory"
+      owner   : "{{ cuckoo_user }}"
+      group   : "{{ cuckoo_group }}"
     sudo: yes
 
+  - name: check if ssdeep was previously downloaded
+    stat:
+      path  : "{{ ssdeep_path }}/ssdeep.tar.gz"
+    register: ssdeep_tar
+
   - name: download ssdeep source code
-    get_url: url="{{ ssdeep_repo }}" dest={{ ssdeep_path }}/ssdeep.tar.gz
+    get_url:
+      url  : "{{ ssdeep_repo }}"
+      dest : "{{ ssdeep_path }}/ssdeep.tar.gz"
+    sudo: yes
+    when: ssdeep_tar.stat.exists == False
 
   - name: check if ssdeep was previously extracted
-    stat: path="{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
+    stat:
+      path  : "{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
     register: ssdeep_dir
 
   - name: extract content of ssdeep archive
-    unarchive: src={{ ssdeep_path }}/ssdeep.tar.gz dest={{ ssdeep_path }}
+    command: "tar -xzf {{ ssdeep_path }}/ssdeep.tar.gz"
+    sudo: yes
     when: ssdeep_dir.stat.exists == False
-
-  - name: check if ssdeep was previously configured
-    stat: path="{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}/config.status"
-    register: ssdeep_status
+    
+  #  Using unarchive module return a "file not found" exception
+  # - name: extract content of ssdeep archive
+  #   unarchive:
+  #     src  : "{{ ssdeep_path }}/ssdeep.tar.gz"
+  #     dest : "{{ ssdeep_path }}/"
+  #   sudo: yes
+  #   when: ssdeep_dir.stat.exists == False
 
   - name: configure ssdeep
-    command: './configure'
-    args:
-      chdir: "{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
-    when: ssdeep_status.stat.exists == False
-
-  - name: make ssdeep
-    command: 'make'
-    args:
-      chdir: "{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
-    when: ssdeep_status.stat.exists == False
-
-  - name: make install ssdeep
-    command: 'make install'
+    command: "./configure"
     sudo: yes
     args:
       chdir: "{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
 
-  - name: check if pydeep was previously installed
-    stat: path="{{ ssdeep_path }}/pydeep"
+  - name: make ssdeep
+    command: "make"
+    sudo: yes
+    args:
+      chdir: "{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
+
+  - name: make install ssdeep
+    command: "make install"
+    sudo: yes
+    args:
+      chdir: "{{ ssdeep_path }}/ssdeep-{{ ssdeep_version }}"
+
+  - name: check if pydeep was previously downloaded
+    stat:
+      path  : "{{ ssdeep_path }}/pydeep"
     register: pydeep_status
 
   - name: clone pydeep repository
-    git: dest="{{ ssdeep_path }}/pydeep" repo={{ pydeep_repo }} version={{ pydeep_version }}
+    git:
+      dest    : "{{ ssdeep_path }}/pydeep"
+      repo    : "{{ pydeep_repo }}"
+      version : "{{ pydeep_version }}"
+    sudo: yes
     when: pydeep_status.stat.exists == False
 
   - name: build pydeep
-    command: 'python setup.py build'
+    command: "python setup.py build"
     sudo: yes
     args:
       chdir: "{{ ssdeep_path }}/pydeep"
 
   - name: install pydeep
-    command: 'python setup.py install'
+    command: "python setup.py install"
     sudo: yes
     args:
       chdir: "{{ ssdeep_path }}/pydeep"
 
   - name: run ldconfig to load python-pydeep properly
-    command: 'ldconfig'
+    command: "ldconfig"
+    sudo: yes
+
+  - name: set proper ownership on ssdeep folder
+    file:
+      path    : "{{ ssdeep_path }}"
+      state   : "directory"
+      owner   : "{{ cuckoo_user }}"
+      group   : "{{ cuckoo_group }}"
+      recurse : "yes"
     sudo: yes

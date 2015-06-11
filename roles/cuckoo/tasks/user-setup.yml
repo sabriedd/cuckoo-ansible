@@ -1,0 +1,69 @@
+---
+
+  - name: create cuckoo group
+    group:
+      name  : "{{ cuckoo_group }}"
+      state : "present"
+    sudo: yes
+
+  - name: create cuckoo user
+    user:
+      name       : "{{ cuckoo_user  }}"
+      group      : "{{ cuckoo_group }}"
+      shell      : "/bin/bash"
+      createhome : "yes"
+      state      : "present"
+    sudo: yes
+
+  - name: check if .ssh/ folder is present
+    stat:
+      path  : "{{ cuckoo_path }}"
+    register: ssh_dir
+
+  - name: create .ssh/ in cuckoo home folder
+    file:
+      path  : "{{ cuckoo_home  }}/.ssh"
+      state : "directory"
+      owner : "{{ cuckoo_user  }}"
+      group : "{{ cuckoo_group }}"
+    sudo: yes
+    when: ssh_dir.stat.exists == False
+
+  - name: ensure github.com is a known host
+    lineinfile:
+      dest   : "{{ cuckoo_home }}/.ssh/known_hosts"
+      create : "yes"
+      state  : "present"
+      line   : "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
+      regexp : "^github\\.com"
+    sudo: yes
+
+  - name: update apt cache and install git
+    apt:
+      name             : "git"
+      update_cache     : "yes"
+      cache_valid_time : 43200
+      state            : "present"
+    sudo: yes
+
+  - name: check if cuckoo is already installed
+    stat:
+      path  : "{{ cuckoo_path }}"
+    register: cuckoo_dir
+
+  - name: clone cuckoo repository
+    git:
+      dest    : "{{ cuckoo_path }}"
+      repo    : "{{ cuckoo_repo }}"
+      version : "{{ cuckoo_version }}"
+    when: cuckoo_dir.stat.exists == False
+    sudo: yes
+
+  - name: set proper ownership on cuckoo's home folder
+    file:
+      path    : "{{ cuckoo_home }}"
+      state   : "directory"
+      owner   : "{{ cuckoo_user }}"
+      group   : "{{ cuckoo_group }}"
+      recurse : "yes"
+    sudo: yes
