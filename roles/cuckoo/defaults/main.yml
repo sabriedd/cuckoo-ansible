@@ -1,6 +1,6 @@
 ---
 
-  # Remote user is the default ubuntu user
+  # Remote user is the ubuntu host user
   # This user need to be sudoer
   remote_user    : "ubuntu"
   remote_group   : "ubuntu"
