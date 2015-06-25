@@ -1,0 +1,17 @@
+---
+
+# path where volatility will be installed
+vol_path: "{{ cuckoo_home }}/volatility"
+
+# url of the volatility repository
+vol_repo: "https://github.com/volatilityfoundation/volatility.git"
+vol_version: "master"
+
+
+pycrypto_path    : "{{ cuckoo_home }}/pycrypto"
+pycrypto_git     : "https://github.com/dlitz/pycrypto.git"
+pycrypto_version : "master"
+
+distorm_path    : "{{ cuckoo_home }}/distorm"
+distorm_git     : "https://github.com/gdabah/distorm"
+distorm_version : "master"

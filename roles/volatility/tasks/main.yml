@@ -1,0 +1,106 @@
+---
+
+  - name: check if pycrypto is already installed
+    stat:
+      path  : "{{ pycrypto_path }}"
+    register: pycrypto_dir
+
+  - name: clone pycrypto repository
+    git:
+      dest    : "{{ pycrypto_path    }}"
+      repo    : "{{ pycrypto_git     }}"
+      version : "{{ pycrypto_version }}"
+    sudo: yes
+    when: pycrypto_dir.stat.exists == False
+
+  - name: build pycrypto
+    command: "python setup.py build"
+    sudo: yes
+    args:
+      chdir: "{{ pycrypto_path }}"
+
+  - name: install pycrypto
+    command: "python setup.py install"
+    sudo: yes
+    args:
+      chdir: "{{ pycrypto_path }}"
+
+  - name: set proper ownership on pycrypto folder
+    file:
+      path    : "{{ pycrypto_path }}"
+      state   : "directory"
+      owner   : "{{ cuckoo_user }}"
+      group   : "{{ cuckoo_group }}"
+      recurse : "yes"
+    sudo: yes
+
+  - name: check if distorm is already installed
+    stat:
+      path  : "{{ distorm_path }}"
+    register: distorm_dir
+
+  - name: clone distorm repository
+    git:
+      dest    : "{{ distorm_path    }}"
+      repo    : "{{ distorm_git     }}"
+      version : "{{ distorm_version }}"
+    sudo: yes
+    when: distorm_dir.stat.exists == False
+
+  - name: build distorm
+    command: "python setup.py build"
+    sudo: yes
+    args:
+      chdir: "{{ distorm_path }}"
+
+  - name: install distorm
+    command: "python setup.py install"
+    sudo: yes
+    args:
+      chdir: "{{ distorm_path }}"
+
+  - name: set proper ownership on distorm folder
+    file:
+      path    : "{{ distorm_path }}"
+      state   : "directory"
+      owner   : "{{ cuckoo_user }}"
+      group   : "{{ cuckoo_group }}"
+      recurse : "yes"
+    sudo: yes
+
+  - name: install volatility dependancies using apt
+    apt:
+      name  : "{{ item }}"
+      state : "present"
+    sudo: yes
+    with_items:
+      - python-pil
+      - python-openpyxl
+
+  - name: check if volatility is already installed
+    stat:
+      path  : "{{ vol_path }}"
+    register: vol_dir
+
+  - name: clone volatility repository
+    git:
+      dest    : "{{ vol_path    }}"
+      repo    : "{{ vol_repo    }}"
+      version : "{{ vol_version }}"
+    sudo: yes
+    when: vol_dir.stat.exists == False
+
+  - name: install volatility
+    command: "python setup.py"
+    sudo: yes
+    args:
+      chdir: "{{ vol_path }}"
+
+  - name: set proper ownership on volatility folder
+    file:
+      path    : "{{ vol_path }}"
+      state   : "directory"
+      owner   : "{{ cuckoo_user }}"
+      group   : "{{ cuckoo_group }}"
+      recurse : "yes"
+    sudo: yes

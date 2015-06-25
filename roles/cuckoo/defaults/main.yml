@@ -2,21 +2,22 @@
 
   # Remote user is the ubuntu host user
   # This user need to be sudoer
-  remote_user    : "ubuntu"
-  remote_group   : "ubuntu"
+  remote_user       : "ubuntu"
+  remote_group      : "ubuntu"
 
   # User that will be created in order to use cuckoo
-  cuckoo_user    : "cuckoo"
-  cuckoo_group   : "cuckoo"
-  cuckoo_home    : "/home/{{ cuckoo_user }}"
+  cuckoo_user       : "cuckoo"
+  cuckoo_group      : "cuckoo"
+  cuckoo_home       : "/home/{{ cuckoo_user }}"
 
   # You can change the cuckoo version to reflect any branch available on github
   # cuckoo_version: monitor
-  cuckoo_repo    : "https://github.com/cuckoobox/cuckoo"
-  cuckoo_version : "master"
+  cuckoo_repo       : "https://github.com/cuckoobox/cuckoo"
+  cuckoo_version    : "master"
 
-  cuckoo_path    : "{{ cuckoo_home }}/cuckoo"
+  cuckoo_path       : "{{ cuckoo_home }}/cuckoo"
 
   # Boolean switches used to install Yara and pydeep/ssdeep
-  install_yara   : "True"
-  install_ssdeep : "True"
+  install_yara      : "True"
+  install_ssdeep    : "True"
+  install_volatility: "True"

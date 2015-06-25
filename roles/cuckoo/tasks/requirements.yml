@@ -29,6 +29,7 @@
       - nose
       - jinja2
       - bottle
+      - flask
       - pefile
       - django
       - pymongo
