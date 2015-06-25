@@ -56,4 +56,4 @@ the `-K` option is used for sudo password prompt
 
 Now you have a cuckoo setup on your machine, prepare your guest machines.
 
-please refer to [Preparing the Guest](http://docs.cuckoosandbox.org/en/latest/installation/host/configuration/)  and proceed with the rest of cuckoo's configuration
+please refer to [Preparing the Guest](http://docs.cuckoosandbox.org/en/latest/installation/guest/)  and proceed with the rest of cuckoo's configuration
